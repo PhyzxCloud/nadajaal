@@ -16,6 +16,6 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "https://PhyzxCloud.github.io/nadajaal"
+  "homepage": "https://cute-parfait-ad69ad.netlify.app/"
 }
         
