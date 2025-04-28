@@ -78,8 +78,8 @@ const App = () => {
         <label style={styles.label}>Left Frequency: {leftFreq} Hz</label>
         <input
           type="range"
-          min="100"
-          max="1000"
+          min="1"
+          max="1200"
           value={leftFreq}
           onChange={(e) => setLeftFreq(e.target.value)}
           style={styles.input}
@@ -87,8 +87,8 @@ const App = () => {
         <label style={styles.label}>Right Frequency: {rightFreq} Hz</label>
         <input
           type="range"
-          min="100"
-          max="1000"
+          min="1"
+          max="1200"
           value={rightFreq}
           onChange={(e) => setRightFreq(e.target.value)}
           style={styles.input}
