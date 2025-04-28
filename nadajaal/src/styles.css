@@ -1,7 +1,7 @@
 /* General styles */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Garamond', serif; /* Apply Garamond font */
   background-color: #121212;
   color: #fff;
   display: flex;
