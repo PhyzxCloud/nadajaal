@@ -1,80 +1,85 @@
-
-import React, { useState, useEffect } from 'react';
-
-const [oscillators, setOscillators] = useState([]);
-const [isPlaying, setIsPlaying] = useState(false);
-
+// src/App.js
+import React, { useState, useEffect, useRef } from 'react';
+import FrequencySlider from './components/FrequencySlider';
 
 const App = () => {
-  const [leftFreq, setLeftFreq] = useState(200); 
-  const [rightFreq, setRightFreq] = useState(210); 
+  const [leftFreq, setLeftFreq] = useState(200);
+  const [rightFreq, setRightFreq] = useState(210);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [audioContext, setAudioContext] = useState(null);
+  const leftOscillator = useRef(null);
+  const rightOscillator = useRef(null);
 
   useEffect(() => {
     setAudioContext(new (window.AudioContext || window.webkitAudioContext)());
   }, []);
 
-const playPauseBinauralBeats = () => {
-  if (!audioContext) return;
+  const startOscillators = () => {
+    if (!audioContext) return;
 
-  if (isPlaying) {
-    // Stop the oscillators
-    oscillators.forEach(osc => osc.stop());
-    setOscillators([]);
-    setIsPlaying(false);
-  } else {
-    // Create and start new oscillators
-    const leftOscillator = audioContext.createOscillator();
-    leftOscillator.frequency.setValueAtTime(leftFreq, audioContext.currentTime);
-    leftOscillator.connect(audioContext.destination);
+    leftOscillator.current = audioContext.createOscillator();
+    leftOscillator.current.frequency.setValueAtTime(leftFreq, audioContext.currentTime);
+    leftOscillator.current.connect(audioContext.destination);
 
-    const rightOscillator = audioContext.createOscillator();
-    rightOscillator.frequency.setValueAtTime(rightFreq, audioContext.currentTime);
-    rightOscillator.connect(audioContext.destination);
+    rightOscillator.current = audioContext.createOscillator();
+    rightOscillator.current.frequency.setValueAtTime(rightFreq, audioContext.currentTime);
+    rightOscillator.current.connect(audioContext.destination);
 
-    leftOscillator.start();
-    rightOscillator.start();
+    leftOscillator.current.start();
+    rightOscillator.current.start();
+  };
 
-    // Store the oscillators and update the state
-    setOscillators([leftOscillator, rightOscillator]);
-    setIsPlaying(true);
+  const stopOscillators = () => {
+    if (leftOscillator.current && rightOscillator.current) {
+      leftOscillator.current.stop();
+      rightOscillator.current.stop();
+    }
+  };
 
-    // Stop the oscillators after 60 seconds
-    setTimeout(() => {
-      leftOscillator.stop();
-      rightOscillator.stop();
-      setOscillators([]);
+  const playBinauralBeats = () => {
+    if (!isPlaying) {
+      startOscillators();
+      setIsPlaying(true);
+    }
+  };
+
+  const pauseBinauralBeats = () => {
+    if (isPlaying) {
+      stopOscillators();
       setIsPlaying(false);
-    }, 60000);
-  }
-};
+    }
+  };
+
+  const handleFrequencyChange = (e, setFreq) => {
+    const value = parseInt(e.target.value, 10);
+    setFreq(value);
+    if (isPlaying) {
+      stopOscillators();
+      startOscillators();
+    }
+  };
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Nadajaal</h1>
-      <div style={styles.frequencyInputs}>
-        <label style={styles.label}>Left Frequency: {leftFreq} Hz</label>
-        <input
-          type="range"
-          min="100"
-          max="1000"
-          value={leftFreq}
-          onChange={(e) => setLeftFreq(e.target.value)}
-          style={styles.input}
-        />
-        <label style={styles.label}>Right Frequency: {rightFreq} Hz</label>
-        <input
-          type="range"
-          min="100"
-          max="1000"
-          value={rightFreq}
-          onChange={(e) => setRightFreq(e.target.value)}
-          style={styles.input}
-        />
+      <FrequencySlider
+        label="Left Frequency"
+        value={leftFreq}
+        onChange={(e) => handleFrequencyChange(e, setLeftFreq)}
+      />
+      <FrequencySlider
+        label="Right Frequency"
+        value={rightFreq}
+        onChange={(e) => handleFrequencyChange(e, setRightFreq)}
+      />
+      <div style={styles.controls}>
+        <button
+          onClick={isPlaying ? pauseBinauralBeats : playBinauralBeats}
+          style={styles.button}
+        >
+          {isPlaying ? 'Pause' : 'Play'} Binaural Beats
+        </button>
       </div>
-      <button onClick={playPauseBinauralBeats} style={styles.button}>
-  {isPlaying ? 'Pause Binaural Beats' : 'Play Binaural Beats'}
-</button>
     </div>
   );
 };
@@ -93,16 +98,10 @@ const styles = {
     fontSize: '3rem',
     marginBottom: '20px',
   },
-  frequencyInputs: {
-    marginBottom: '20px',
-  },
-  label: {
-    margin: '5px',
-    fontSize: '1.2rem',
-  },
-  input: {
-    width: '200px',
-    marginBottom: '10px',
+  controls: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   button: {
     padding: '15px 30px',
@@ -116,4 +115,3 @@ const styles = {
 };
 
 export default App;
-            
