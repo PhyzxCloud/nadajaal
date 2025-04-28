@@ -1,6 +1,6 @@
 // src/App.js
 import React from 'react';
-import BinauralBeats from './components/BinauralBeats';
+// import BinauralBeats from './components/BinauralBeats';
 import ProgramCard from './components/ProgramCard.js';
 
 const App = () => {
