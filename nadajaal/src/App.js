@@ -1,6 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 
+const [oscillators, setOscillators] = useState([]);
+const [isPlaying, setIsPlaying] = useState(false);
+
+
 const App = () => {
   const [leftFreq, setLeftFreq] = useState(200); 
   const [rightFreq, setRightFreq] = useState(210); 
@@ -10,9 +14,16 @@ const App = () => {
     setAudioContext(new (window.AudioContext || window.webkitAudioContext)());
   }, []);
 
-  const playBinauralBeats = () => {
-    if (!audioContext) return;
+const playPauseBinauralBeats = () => {
+  if (!audioContext) return;
 
+  if (isPlaying) {
+    // Stop the oscillators
+    oscillators.forEach(osc => osc.stop());
+    setOscillators([]);
+    setIsPlaying(false);
+  } else {
+    // Create and start new oscillators
     const leftOscillator = audioContext.createOscillator();
     leftOscillator.frequency.setValueAtTime(leftFreq, audioContext.currentTime);
     leftOscillator.connect(audioContext.destination);
@@ -24,11 +35,19 @@ const App = () => {
     leftOscillator.start();
     rightOscillator.start();
 
+    // Store the oscillators and update the state
+    setOscillators([leftOscillator, rightOscillator]);
+    setIsPlaying(true);
+
+    // Stop the oscillators after 60 seconds
     setTimeout(() => {
       leftOscillator.stop();
       rightOscillator.stop();
-    }, 60000); 
-  };
+      setOscillators([]);
+      setIsPlaying(false);
+    }, 60000);
+  }
+};
 
   return (
     <div style={styles.container}>
@@ -53,7 +72,9 @@ const App = () => {
           style={styles.input}
         />
       </div>
-      <button onClick={playBinauralBeats} style={styles.button}>Play Binaural Beats</button>
+      <button onClick={playPauseBinauralBeats} style={styles.button}>
+  {isPlaying ? 'Pause Binaural Beats' : 'Play Binaural Beats'}
+</button>
     </div>
   );
 };
